@@ -24,10 +24,10 @@ int main() {
     ratings.push_back(Rating(1, 1, 4.8));
     ratings.push_back(Rating(1, 2, 4.7));
     ratings.push_back(Rating(2, 1, 5.0));
-    ratings.push_back(Rating(2, 3, 4.0));
+    ratings.push_back(Rating(2, 3, 4.8));
     ratings.push_back(Rating(3, 1, 4.9));
     ratings.push_back(Rating(3, 2, 4.1));
-    ratings.push_back(Rating(3, 3, 3.8));
+    ratings.push_back(Rating(3, 3, 4.9));
     ratings.push_back(Rating(4, 1, 7.9));
     ratings.push_back(Rating(4, 2, 3.6));
     ratings.push_back(Rating(4, 3, 0.0));
@@ -37,10 +37,10 @@ int main() {
     movies[0].addRating(4.8);
     movies[1].addRating(4.7);
     movies[0].addRating(5.0);
-    movies[2].addRating(4.0);
+    movies[2].addRating(4.8);
     movies[0].addRating(4.9);
     movies[1].addRating(4.1);
-    movies[2].addRating(3.8);
+    movies[2].addRating(4.9);
     movies[0].addRating(7.9);
     movies[1].addRating(3.6);
     movies[2].addRating(0.0);
