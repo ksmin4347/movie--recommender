@@ -10,8 +10,8 @@ int main() {
     std::vector<Rating> ratings;
 
     // 영화 추가
-    movies.push_back(Movie(1, "기생충", "드라마", 2019));
-    movies.push_back(Movie(2, "인터스텔라", "SF", 2014));
+    movies.push_back(Movie(1, "기생충", "드라마", 2019));   //push_back(): 벡터 맨 뒤에 새로운 원소 추가하는 함수
+    movies.push_back(Movie(2, "인터스텔라", "SF", 2014));   //Movie(): 매개변수 생성자를 호출해서 Movie 객체 만드는 코드
     movies.push_back(Movie(3, "왕과 사는 남자", "사극", 2026));
 
     // 사용자 추가
@@ -34,8 +34,8 @@ int main() {
 
 
     // Movie에 평점 반영
-    movies[0].addRating(4.8);
-    movies[1].addRating(4.7);
+    movies[0].addRating(4.8);       //왜 Rating과 Movie에 평점을 둘 다 넣었나요?
+    movies[1].addRating(4.7);           //Rating은 기록을 저장하고, Movie는 평균 계산을 위해 총합과 개수를 관리하기 때문
     movies[0].addRating(5.0);
     movies[2].addRating(4.8);
     movies[0].addRating(4.9);
@@ -45,7 +45,7 @@ int main() {
     movies[1].addRating(3.6);
     movies[2].addRating(0.0);
 
-    std::cout << "=== 영화 목록 ===" << std::endl;
+    std::cout << "=== 영화 목록 ===" << std::endl;      //movies 벡터의 모든 영화 객체를 하나씩 꺼내서 출력하는 부분
     for (const Movie& m : movies) {
         m.display();
     }
@@ -69,3 +69,6 @@ int main() {
 
     return 0;
 }
+
+// const Movie& m
+    // 복사하지 않고 참조로 받아서 효율적이고 수정하지 않기 위해 const를 붙인 것
