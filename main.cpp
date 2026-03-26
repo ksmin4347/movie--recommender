@@ -22,12 +22,13 @@ int main() {
 
     // 평점 추가
     ratings.push_back(Rating(1, 1, 4.8));
-    ratings.push_back(Rating(1, 2, 4.7));
+    ratings.push_back(Rating(1, 2, 4.6));
+    ratings.push_back(Rating(1, 3, 4.9));
     ratings.push_back(Rating(2, 1, 5.0));
-    ratings.push_back(Rating(2, 3, 4.8));
+    ratings.push_back(Rating(2, 3, 4.9));
     ratings.push_back(Rating(3, 1, 4.9));
     ratings.push_back(Rating(3, 2, 4.1));
-    ratings.push_back(Rating(3, 3, 4.9));
+    ratings.push_back(Rating(3, 3, 5.0));
     ratings.push_back(Rating(4, 1, 7.9));
     ratings.push_back(Rating(4, 2, 3.6));
     ratings.push_back(Rating(4, 3, 0.0));
@@ -35,12 +36,13 @@ int main() {
 
     // Movie에 평점 반영
     movies[0].addRating(4.8);       //왜 Rating과 Movie에 평점을 둘 다 넣었나요?
-    movies[1].addRating(4.7);           //Rating은 기록을 저장하고, Movie는 평균 계산을 위해 총합과 개수를 관리하기 때문
+    movies[1].addRating(4.6);           //Rating은 기록을 저장하고, Movie는 평균 계산을 위해 총합과 개수를 관리하기 때문
+    movies[2].addRating(4.9);
     movies[0].addRating(5.0);
-    movies[2].addRating(4.8);
+    movies[2].addRating(4.9);
     movies[0].addRating(4.9);
     movies[1].addRating(4.1);
-    movies[2].addRating(4.9);
+    movies[2].addRating(5.0);
     movies[0].addRating(7.9);
     movies[1].addRating(3.6);
     movies[2].addRating(0.0);
