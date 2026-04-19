@@ -1,76 +1,139 @@
-#include "Movie.h"
-#include "User.h"
-#include "Rating.h"
-#include <vector>
+#include "MovieManager.h"
+#include "UserManager.h"
+#include "RatingManager.h"
 #include <iostream>
+#include <string>
 
 int main() {
-    std::vector<Movie> movies;      //여러 개의 객체를 효율적으로 관리하기 위해 사용
-    std::vector<User> users;        //배열 대신 vector를 쓴 이유: 크기가 자동으로 조절되기 때문에 더 유연하게 데이터를 관리
-    std::vector<Rating> ratings;
+    MovieManager movieManager;
+    UserManager userManager;
+    RatingManager ratingManager;
 
-    // 영화 추가
-    movies.push_back(Movie(1, "기생충", "드라마", 2019));   //push_back(): 벡터 맨 뒤에 새로운 원소 추가하는 함수
-    movies.push_back(Movie(2, "인터스텔라", "SF", 2014));   //Movie(): 매개변수 생성자를 호출해서 Movie 객체 만드는 코드
-    movies.push_back(Movie(3, "왕과 사는 남자", "사극", 2026));
+    int choice;
 
-    // 사용자 추가
-    users.push_back(User(1, "김민수", "kim@naver.com"));
-    users.push_back(User(2, "성기훈", "giveme456@naver.com"));
-    users.push_back(User(3, "김민정", "winter@gmail.com"));
-    users.push_back(User(4, "유지민", "karina@naver.com"));
+    do {
+        std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
+        std::cout << "1. 영화 추가" << std::endl;
+        std::cout << "2. 제목으로 영화 검색" << std::endl;
+        std::cout << "3. 전체 영화 목록 출력" << std::endl;
+        std::cout << "4. 평점순 영화 목록 출력" << std::endl;
+        std::cout << "5. 사용자 추가" << std::endl;
+        std::cout << "6. 전체 사용자 목록 출력" << std::endl;
+        std::cout << "7. 평점 입력" << std::endl;
+        std::cout << "8. 특정 영화의 평점 목록 출력" << std::endl;
+        std::cout << "9. 전체 평점 목록 출력" << std::endl;
+        std::cout << "0. 종료" << std::endl;
+        std::cout << "메뉴 선택: ";
+        std::cin >> choice;
 
-    // 평점 추가
-    ratings.push_back(Rating(1, 1, 4.8));
-    ratings.push_back(Rating(1, 2, 4.6));
-    ratings.push_back(Rating(1, 3, 4.9));
-    ratings.push_back(Rating(2, 1, 5.0));
-    ratings.push_back(Rating(2, 3, 4.9));
-    ratings.push_back(Rating(3, 1, 4.9));
-    ratings.push_back(Rating(3, 2, 4.1));
-    ratings.push_back(Rating(3, 3, 5.0));
-    ratings.push_back(Rating(4, 1, 7.9));
-    ratings.push_back(Rating(4, 2, 3.6));
-    ratings.push_back(Rating(4, 3, 0.0));
+        if (choice == 1) {
+            int id, year;
+            std::string title, genre;
 
+            std::cout << "영화 ID: ";
+            std::cin >> id;
+            std::cin.ignore();
 
-    // Movie에 평점 반영
-    movies[0].addRating(4.8);       //왜 Rating과 Movie에 평점을 둘 다 넣었나요?
-    movies[1].addRating(4.6);           //Rating은 기록을 저장하고, Movie는 평균 계산을 위해 총합과 개수를 관리하기 때문
-    movies[2].addRating(4.9);
-    movies[0].addRating(5.0);
-    movies[2].addRating(4.9);
-    movies[0].addRating(4.9);
-    movies[1].addRating(4.1);
-    movies[2].addRating(5.0);
-    movies[0].addRating(7.9);
-    movies[1].addRating(3.6);
-    movies[2].addRating(0.0);
+            std::cout << "영화 제목: ";
+            std::getline(std::cin, title);
 
-    std::cout << "=== 영화 목록 ===" << std::endl;      //movies 벡터의 모든 영화 객체를 하나씩 꺼내서 출력하는 부분
-    for (const Movie& m : movies) {
-        m.display();
-    }
+            std::cout << "장르: ";
+            std::getline(std::cin, genre);
 
-    std::cout << "=== 사용자 목록 ===" << std::endl;
-    for (const User& u : users) {
-        u.display();
-    }
+            std::cout << "개봉 연도: ";
+            std::cin >> year;
 
-    std::cout << "=== 평점 목록 ===" << std::endl;
-    for (const Rating& r : ratings) {
-    if (r.getScore() != -1.0) {
-        r.display();
-    }
-    else {
-        std::cout << "User: " << r.getUserId()
-                  << " Movie: " << r.getMovieId()
-                  << " Score: 오류" << std::endl;
-    }
-}
+            movieManager.addMovie(id, title, genre, year);
+        }
+
+        else if (choice == 2) {
+            std::string title;
+            std::cin.ignore();
+
+            std::cout << "검색할 제목: ";
+            std::getline(std::cin, title);
+
+            movieManager.searchByTitle(title);
+        }
+
+        else if (choice == 3) {
+            movieManager.printAllMovies();
+        }
+
+        else if (choice == 4) {
+            movieManager.printMoviesSortedByRating();
+        }
+
+        else if (choice == 5) {
+            int id;
+            std::string name, email;
+
+            std::cout << "사용자 ID: ";
+            std::cin >> id;
+            std::cin.ignore();
+
+            std::cout << "이름: ";
+            std::getline(std::cin, name);
+
+            std::cout << "이메일: ";
+            std::getline(std::cin, email);
+
+            userManager.addUser(id, name, email);
+        }
+
+        else if (choice == 6) {
+            userManager.printAllUsers();
+        }
+
+        else if (choice == 7) {
+            int userId, movieId;
+            double score;
+
+            std::cout << "사용자 ID: ";
+            std::cin >> userId;
+            std::cout << "영화 ID: ";
+            std::cin >> movieId;
+            std::cout << "평점: ";
+            std::cin >> score;
+
+            if (!userManager.hasUser(userId)) {
+                std::cout << "존재하지 않는 사용자 ID입니다." << std::endl;
+                continue;
+            }
+
+            if (!movieManager.hasMovie(movieId)) {
+                std::cout << "존재하지 않는 영화 ID입니다." << std::endl;
+                continue;
+            }
+
+            ratingManager.addRating(userId, movieId, score);
+
+            if (score >= 0.0 && score <= 5.0) {
+                movieManager.addRatingToMovie(movieId, score);
+            }
+        }
+
+        else if (choice == 8) {
+            int movieId;
+            std::cout << "영화 ID 입력: ";
+            std::cin >> movieId;
+
+            ratingManager.printRatingsByMovie(movieId);
+        }
+
+        else if (choice == 9) {
+            ratingManager.printAllRatings();
+        }
+
+        else if (choice == 0) {
+            std::cout << "프로그램을 종료합니다." << std::endl;
+        }
+
+        else {
+            std::cout << "잘못된 메뉴입니다." << std::endl;
+        }
+
+    } while (choice != 0);
 
     return 0;
 }
-
-// const Movie& m
-    // 복사하지 않고 참조로 받아서 효율적이고 수정하지 않기 위해 const를 붙인 것
