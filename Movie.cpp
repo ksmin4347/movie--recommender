@@ -21,10 +21,11 @@ double Movie::getAverageRating() const {
     return totalRating / ratingCount;
 }
 
-void Movie::addRating(double r) {
-    if (r < 0.0 || r > 5.0) return;
+bool Movie::addRating(double r) {
+    if (r < 0.0 || r > 5.0) return false;
     totalRating += r;
     ratingCount++;
+    return true;
 }
 
 void Movie::display() const {

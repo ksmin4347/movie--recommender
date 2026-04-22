@@ -106,11 +106,15 @@ int main() {
                 continue;
             }
 
-            ratingManager.addRating(userId, movieId, score);
-
-            if (score >= 0.0 && score <= 5.0) {
-                movieManager.addRatingToMovie(movieId, score);
+            if (score < 0.0 || score > 5.0) {
+                std::cout << "평점은 0.0 이상 5.0 이하만 입력할 수 있습니다." << std::endl;
+                continue;
             }
+
+            ratingManager.addRating(userId, movieId, score);
+            movieManager.addRatingToMovie(movieId, score);
+
+            std::cout << "평점이 정상적으로 입력되었습니다." << std::endl;
         }
 
         else if (choice == 8) {
