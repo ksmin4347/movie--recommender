@@ -4,6 +4,21 @@
 #include <iostream>
 #include <string>
 
+void printMenu() {
+    std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
+    std::cout << "1. 영화 추가" << std::endl;
+    std::cout << "2. 제목으로 영화 검색" << std::endl;
+    std::cout << "3. 전체 영화 목록 출력" << std::endl;
+    std::cout << "4. 평점순 영화 목록 출력" << std::endl;
+    std::cout << "5. 사용자 추가" << std::endl;
+    std::cout << "6. 전체 사용자 목록 출력" << std::endl;
+    std::cout << "7. 평점 입력" << std::endl;
+    std::cout << "8. 특정 영화의 평점 목록 출력" << std::endl;
+    std::cout << "9. 전체 평점 목록 출력" << std::endl;
+    std::cout << "0. 종료" << std::endl;
+    std::cout << "메뉴 선택: ";
+}
+
 int main() {
     MovieManager movieManager;
     UserManager userManager;
@@ -12,18 +27,7 @@ int main() {
     int choice;
 
     do {
-        std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
-        std::cout << "1. 영화 추가" << std::endl;
-        std::cout << "2. 제목으로 영화 검색" << std::endl;
-        std::cout << "3. 전체 영화 목록 출력" << std::endl;
-        std::cout << "4. 평점순 영화 목록 출력" << std::endl;
-        std::cout << "5. 사용자 추가" << std::endl;
-        std::cout << "6. 전체 사용자 목록 출력" << std::endl;
-        std::cout << "7. 평점 입력" << std::endl;
-        std::cout << "8. 특정 영화의 평점 목록 출력" << std::endl;
-        std::cout << "9. 전체 평점 목록 출력" << std::endl;
-        std::cout << "0. 종료" << std::endl;
-        std::cout << "메뉴 선택: ";
+        printMenu();
         std::cin >> choice;
 
         if (choice == 1) {
