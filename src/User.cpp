@@ -31,7 +31,7 @@ void User::display() const {
 // 실제 출력 형식은 operator<<에 맡기고,
 // display()는 출력 요청만 담당
 
-std::ostream& operator<<(std::ostream& os, const User& user) {
+std::ostream& operator<<(std::ostream& os, const User& user) {  //os: 출력 스트림 객체, cout이 전달
     // User 객체를 cout으로 출력하기 위한 연산자 오버로딩
 
     os << user.getId() << " " << user.getName() << " " << user.getEmail();

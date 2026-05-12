@@ -1,41 +1,51 @@
 # compiler
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -g
+CXXFLAGS = -std=c++17 -Wall -g -Iinclude
 
 # target
 TARGET = movie_recommender
 
 # object files
-OBJS = main.o Movie.o User.o Rating.o MovieManager.o UserManager.o RatingManager.o
+OBJS = src/main.o \
+       src/Movie.o \
+       src/User.o \
+       src/Rating.o \
+       src/MovieManager.o \
+       src/UserManager.o \
+       src/RatingManager.o \
+       src/SimilarityCalculator.o
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-main.o: main.cpp MovieManager.h UserManager.h RatingManager.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/main.o: src/main.cpp include/MovieManager.h include/UserManager.h include/RatingManager.h include/SimilarityCalculator.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-Movie.o: Movie.cpp Movie.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/Movie.o: src/Movie.cpp include/Movie.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-User.o: User.cpp User.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/User.o: src/User.cpp include/User.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-Rating.o: Rating.cpp Rating.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/Rating.o: src/Rating.cpp include/Rating.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-MovieManager.o: MovieManager.cpp MovieManager.h Movie.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/MovieManager.o: src/MovieManager.cpp include/MovieManager.h include/Movie.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-UserManager.o: UserManager.cpp UserManager.h User.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/UserManager.o: src/UserManager.cpp include/UserManager.h include/User.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-RatingManager.o: RatingManager.cpp RatingManager.h Rating.h
-	$(CXX) $(CXXFLAGS) -c $<
+src/RatingManager.o: src/RatingManager.cpp include/RatingManager.h include/Rating.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/SimilarityCalculator.o: src/SimilarityCalculator.cpp include/SimilarityCalculator.h include/Rating.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean run
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f src/*.o $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)

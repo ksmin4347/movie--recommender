@@ -49,10 +49,12 @@ bool Movie::addRating(double r) {          // 영화에 평점 하나를 추가�
 void Movie::display() const {              // 영화 정보를 화면에 출력하는 함수
     std::cout << *this << std::endl;       // 현재 객체 자신(*this)을 operator<<로 출력
 }                                          // 출력 형식을 한 곳(operator<<)에 모아두기 위해 이렇게 작성함
+                                           // *this? 현재 객체를 나타내는 this 포인터를 역참조해서 객체 자신을 의미
 
 bool Movie::operator==(const Movie& other) const {   // 두 Movie 객체가 같은 영화인지 비교하는 연산자
     return id == other.id;                            // id가 같으면 같은 영화로 판단
 }                                                     // 객체 상태를 바꾸지 않으므로 const 사용
+                                                      //other: 비교대상이 되는 다른 객체
 
 bool Movie::operator<(const Movie& other) const {     // 두 Movie 객체의 대소 비교를 정의하는 연산자
     return getAverageRating() > other.getAverageRating();

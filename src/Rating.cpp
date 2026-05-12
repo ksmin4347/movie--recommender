@@ -15,7 +15,7 @@ Rating::Rating(int userId, int movieId, double s)
     if (s < 0.0 || s > 5.0)
         score = -1.0;   // 잘못된 평점이면 -1.0으로 설정 (에러 상태 표시)
     else
-        score = s;      // 정상 범위면 그대로 저장
+        score = s;      // 정상 범위면 그대로 저장     //main에서 한번 막지만 방어적 프로그래밍으로 한번 더 방지
 }
 
 int Rating::getUserId() const { return userId; }
