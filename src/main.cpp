@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iomanip>
+#include <cmath>
 
 void printMenu() {
     std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
@@ -167,11 +169,12 @@ int main() {
                 continue;
             }
 
-            int bestUserId = -1;
-            int bestSimilarity = -101;
+            double bestSimilarity = -101.0;
+            std::vector<int> bestUserIds;
 
             std::vector<int> userIds = ratingManager.getAllUserIds();
 
+            std::cout << std::fixed << std::setprecision(1);
             std::cout << "\n--- 유사도 계산 결과 ---" << std::endl;
 
             for (int otherUserId : userIds) {
@@ -181,7 +184,7 @@ int main() {
 
                 std::vector<Rating> otherRatings = ratingManager.findByUser(otherUserId);
 
-                int similarity = SimilarityCalculator::calculate(
+                double similarity = SimilarityCalculator::calculate(
                     targetRatings,
                     otherRatings
                 );
@@ -192,17 +195,23 @@ int main() {
 
                 if (similarity > bestSimilarity) {
                     bestSimilarity = similarity;
-                    bestUserId = otherUserId;
+                    bestUserIds.clear();
+                    bestUserIds.push_back(otherUserId);
+                } else if (std::abs(similarity - bestSimilarity) < 0.000001) {
+                    bestUserIds.push_back(otherUserId);
                 }
             }
 
-            if (bestUserId == -1 || bestSimilarity <= -100) {
+            if (bestUserIds.empty() || bestSimilarity <= -100.0) {
                 std::cout << "비교 가능한 유사 사용자가 없습니다." << std::endl;
             } else {
-                std::cout << "가장 비슷한 사용자: 사용자 "
-                          << bestUserId
-                          << " (유사도 " << bestSimilarity << ")"
-                          << std::endl;
+                std::cout << "\n가장 비슷한 사용자:" << std::endl;
+
+                for (int userId : bestUserIds) {
+                    std::cout << "사용자 " << userId
+                              << " (유사도 " << bestSimilarity << ")"
+                              << std::endl;
+                }
             }
         }
 

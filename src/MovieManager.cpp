@@ -63,6 +63,7 @@ bool MovieManager::hasMovie(int movieId) const {
             return true;
         }
     }
+
     return false;
 }
 
@@ -115,7 +116,7 @@ void MovieManager::loadFromFile(const std::string& filename) {
         int id;
         std::string title;
         std::string genre;
-        int year;
+        int releaseYear;
 
         std::getline(ss, token, ',');
         id = std::stoi(token);
@@ -125,9 +126,9 @@ void MovieManager::loadFromFile(const std::string& filename) {
         std::getline(ss, genre, ',');
 
         std::getline(ss, token, ',');
-        year = std::stoi(token);
+        releaseYear = std::stoi(token);
 
-        movies.push_back(Movie(id, title, genre, year));
+        movies.push_back(Movie(id, title, genre, releaseYear));
     }
 
     file.close();

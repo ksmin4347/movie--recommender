@@ -1,7 +1,7 @@
 #include "SimilarityCalculator.h"
 #include <cmath>
 
-int SimilarityCalculator::calculate(
+double SimilarityCalculator::calculate(
     const std::vector<Rating>& user1,
     const std::vector<Rating>& user2)
 {
@@ -18,8 +18,8 @@ int SimilarityCalculator::calculate(
     }
 
     if (commonCount == 0) {
-        return -100;
+        return -100.0;
     }
 
-    return static_cast<int>(commonCount * 10 - scoreDiffSum);
+    return commonCount * 10.0 - scoreDiffSum;
 }
