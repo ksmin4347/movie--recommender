@@ -30,13 +30,13 @@ src/User.o: src/User.cpp include/User.h
 src/Rating.o: src/Rating.cpp include/Rating.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-src/MovieManager.o: src/MovieManager.cpp include/MovieManager.h include/Movie.h
+src/MovieManager.o: src/MovieManager.cpp include/MovieManager.h include/Movie.h include/BaseManager.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-src/UserManager.o: src/UserManager.cpp include/UserManager.h include/User.h
+src/UserManager.o: src/UserManager.cpp include/UserManager.h include/User.h include/BaseManager.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-src/RatingManager.o: src/RatingManager.cpp include/RatingManager.h include/Rating.h
+src/RatingManager.o: src/RatingManager.cpp include/RatingManager.h include/Rating.h include/BaseManager.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 src/SimilarityCalculator.o: src/SimilarityCalculator.cpp include/SimilarityCalculator.h include/Rating.h

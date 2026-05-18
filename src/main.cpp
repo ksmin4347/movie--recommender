@@ -24,6 +24,16 @@ int main() {   // 프로그램 시작점. 사용자의 입력을 받아 각 Mana
     UserManager userManager;       // 사용자 데이터들을 관리하는 객체 생성
     RatingManager ratingManager;   // 평점 데이터들을 관리하는 객체 생성
 
+    movieManager.loadFromFile("data/movies.csv");
+    userManager.loadFromFile("data/users.csv");
+    ratingManager.loadFromFile("data/ratings.csv");
+
+    for (const Rating& rating : ratingManager.getRatings()) {
+        if (rating.isValid()) {
+            movieManager.addRatingToMovie(rating.getMovieId(), rating.getScore());
+        }
+    }
+
     int choice;   // 사용자가 선택한 메뉴 번호를 저장할 변수
 
     do {   // 사용자가 0을 입력할 때까지 메뉴를 반복 실행
@@ -141,9 +151,13 @@ int main() {   // 프로그램 시작점. 사용자의 입력을 받아 각 Mana
             std::cout << "잘못된 메뉴입니다." << std::endl;   // 잘못된 입력 안내
         }
 
-    } while (choice != 0);   // choice가 0이 아닐 동안 계속 반복해서 메뉴 실행
+    } while (choice != 0);
 
-    return 0;   // 프로그램 정상 종료를 운영체제에 알림
+    movieManager.saveToFile("data/movies.csv");
+    userManager.saveToFile("data/users.csv");
+    ratingManager.saveToFile("data/ratings.csv");
+
+    return 0;
 }
 
 /*
