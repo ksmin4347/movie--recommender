@@ -1,8 +1,7 @@
-#ifndef SIMILARITYCALCULATOR_H
-#define SIMILARITYCALCULATOR_H
+#pragma once
 
-#include <vector>
 #include "Rating.h"
+#include <vector>
 
 class SimilarityCalculator {
 public:
@@ -11,5 +10,3 @@ public:
         const std::vector<Rating>& user2
     );
 };
-
-#endif

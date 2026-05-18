@@ -23,6 +23,8 @@ public:
 
     bool addRatingToMovie(int movieId, double score);
 
+    const Movie* findById(int movieId) const;
+
     void loadFromFile(const std::string& filename) override;
     void saveToFile(const std::string& filename) const override;
     int size() const override;

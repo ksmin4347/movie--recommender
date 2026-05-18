@@ -18,6 +18,10 @@ public:
 
     const std::vector<Rating>& getRatings() const;
 
+    std::vector<Rating> findByUser(int userId) const;
+
+    std::vector<int> getAllUserIds() const;
+
     void loadFromFile(const std::string& filename) override;
     void saveToFile(const std::string& filename) const override;
     int size() const override;
