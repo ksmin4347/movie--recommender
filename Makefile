@@ -18,7 +18,8 @@ OBJS = $(OBJDIR)/main.o \
        $(OBJDIR)/MovieManager.o \
        $(OBJDIR)/UserManager.o \
        $(OBJDIR)/RatingManager.o \
-       $(OBJDIR)/SimilarityCalculator.o
+       $(OBJDIR)/SimilarityCalculator.o \
+       $(OBJDIR)/Recommender.o
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
@@ -26,7 +27,7 @@ $(TARGET): $(OBJS)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(INCDIR)/MovieManager.h $(INCDIR)/UserManager.h $(INCDIR)/RatingManager.h $(INCDIR)/SimilarityCalculator.h | $(OBJDIR)
+$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(INCDIR)/MovieManager.h $(INCDIR)/UserManager.h $(INCDIR)/RatingManager.h $(INCDIR)/Recommender.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/Movie.o: $(SRCDIR)/Movie.cpp $(INCDIR)/Movie.h | $(OBJDIR)
@@ -38,7 +39,7 @@ $(OBJDIR)/User.o: $(SRCDIR)/User.cpp $(INCDIR)/User.h | $(OBJDIR)
 $(OBJDIR)/Rating.o: $(SRCDIR)/Rating.cpp $(INCDIR)/Rating.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJDIR)/MovieManager.o: $(SRCDIR)/MovieManager.cpp $(INCDIR)/MovieManager.h $(INCDIR)/Movie.h $(INCDIR)/BaseManager.h | $(OBJDIR)
+$(OBJDIR)/MovieManager.o: $(SRCDIR)/MovieManager.cpp $(INCDIR)/MovieManager.h $(INCDIR)/Movie.h $(INCDIR)/Rating.h $(INCDIR)/BaseManager.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/UserManager.o: $(SRCDIR)/UserManager.cpp $(INCDIR)/UserManager.h $(INCDIR)/User.h $(INCDIR)/BaseManager.h | $(OBJDIR)
@@ -48,6 +49,9 @@ $(OBJDIR)/RatingManager.o: $(SRCDIR)/RatingManager.cpp $(INCDIR)/RatingManager.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/SimilarityCalculator.o: $(SRCDIR)/SimilarityCalculator.cpp $(INCDIR)/SimilarityCalculator.h $(INCDIR)/Rating.h | $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJDIR)/Recommender.o: $(SRCDIR)/Recommender.cpp $(INCDIR)/Recommender.h $(INCDIR)/MovieManager.h $(INCDIR)/RatingManager.h $(INCDIR)/SimilarityCalculator.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean run

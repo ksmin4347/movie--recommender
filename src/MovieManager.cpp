@@ -3,6 +3,16 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <set>
+#include <utility>
+
+void MovieManager::sortMoviesById() {
+    std::sort(movies.begin(), movies.end(),
+        [](const Movie& a, const Movie& b) {
+            return a.getId() < b.getId();
+        }
+    );
+}
 
 void MovieManager::addMovie(int id, const std::string& title,
                             const std::string& genre, int year) {
@@ -14,6 +24,8 @@ void MovieManager::addMovie(int id, const std::string& title,
     }
 
     movies.push_back(Movie(id, title, genre, year));
+    sortMoviesById();
+
     std::cout << "영화가 추가되었습니다." << std::endl;
 }
 
@@ -74,8 +86,7 @@ bool MovieManager::addRatingToMovie(int movieId, double score) {
                 return false;
             }
 
-            movie.addRating(score);
-            return true;
+            return movie.addRating(score);
         }
     }
 
@@ -90,6 +101,91 @@ const Movie* MovieManager::findById(int movieId) const {
     }
 
     return nullptr;
+}
+
+double MovieManager::calculateGenreSimilarity(
+    const std::string& genre,
+    const std::vector<Rating>& userRatings
+) const {
+    double scoreSum = 0.0;
+    int count = 0;
+
+    for (const Rating& rating : userRatings) {
+        const Movie* watchedMovie = findById(rating.getMovieId());
+
+        if (watchedMovie == nullptr) {
+            continue;
+        }
+
+        if (watchedMovie->getGenre() == genre && rating.getScore() >= 4.0) {
+            scoreSum += rating.getScore();
+            count++;
+        }
+    }
+
+    if (count == 0) {
+        return 0.0;
+    }
+
+    return scoreSum / count;
+}
+
+std::vector<Movie> MovieManager::recommend(
+    const std::vector<Rating>& userRatings,
+    int n
+) const {
+    std::vector<Movie> result;
+
+    if (userRatings.empty() || n <= 0) {
+        return result;
+    }
+
+    std::set<int> watchedMovieIds;
+
+    for (const Rating& rating : userRatings) {
+        watchedMovieIds.insert(rating.getMovieId());
+    }
+
+    std::vector<std::pair<Movie, double>> scoredMovies;
+
+    for (const Movie& candidate : movies) {
+        if (watchedMovieIds.find(candidate.getId()) != watchedMovieIds.end()) {
+            continue;
+        }
+
+        double genreSimilarity = calculateGenreSimilarity(
+            candidate.getGenre(),
+            userRatings
+        );
+
+        if (genreSimilarity <= 0.0) {
+            continue;
+        }
+
+        double finalScore = genreSimilarity * 10.0
+                          + candidate.getAverageRating();
+
+        scoredMovies.push_back({candidate, finalScore});
+    }
+
+    std::sort(scoredMovies.begin(), scoredMovies.end(),
+        [](const std::pair<Movie, double>& a,
+           const std::pair<Movie, double>& b) {
+            if (a.second == b.second) {
+                return a.first.getId() < b.first.getId();
+            }
+
+            return a.second > b.second;
+        }
+    );
+
+    int count = std::min(n, static_cast<int>(scoredMovies.size()));
+
+    for (int i = 0; i < count; i++) {
+        result.push_back(scoredMovies[i].first);
+    }
+
+    return result;
 }
 
 void MovieManager::loadFromFile(const std::string& filename) {
@@ -130,6 +226,8 @@ void MovieManager::loadFromFile(const std::string& filename) {
 
         movies.push_back(Movie(id, title, genre, releaseYear));
     }
+
+    sortMoviesById();
 
     file.close();
 

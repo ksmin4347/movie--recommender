@@ -1,0 +1,25 @@
+# compiled object files
+*.o
+*.a
+*.out
+
+# obj directory
+obj/
+
+# executable files
+movie_recommender
+movie
+main
+app
+
+# temporary files
+code_dump.txt
+valgrind_result.txt
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

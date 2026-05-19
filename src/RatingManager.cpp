@@ -4,9 +4,33 @@
 #include <sstream>
 #include <algorithm>
 
-void RatingManager::addRating(int userId, int movieId, double score) {
-    ratings.push_back(Rating(userId, movieId, score));
-    std::cout << "평점이 저장되었습니다." << std::endl;
+void RatingManager::sortRatingsByUserAndMovie() {
+    std::sort(ratings.begin(), ratings.end(),
+        [](const Rating& a, const Rating& b) {
+            if (a.getUserId() == b.getUserId()) {
+                return a.getMovieId() < b.getMovieId();
+            }
+
+            return a.getUserId() < b.getUserId();
+        }
+    );
+}
+
+bool RatingManager::addRating(int userId, int movieId, double score) {
+    Rating rating(userId, movieId, score);
+
+    if (!rating.isValid()) {
+        return false;
+    }
+
+    if (hasRating(userId, movieId)) {
+        return false;
+    }
+
+    ratings.push_back(rating);
+    sortRatingsByUserAndMovie();
+
+    return true;
 }
 
 void RatingManager::printAllRatings() const {
@@ -55,6 +79,10 @@ std::vector<int> RatingManager::getAllUserIds() const {
     std::vector<int> userIds;
 
     for (const Rating& rating : ratings) {
+        if (!rating.isValid()) {
+            continue;
+        }
+
         int userId = rating.getUserId();
 
         if (std::find(userIds.begin(), userIds.end(), userId) == userIds.end()) {
@@ -62,7 +90,19 @@ std::vector<int> RatingManager::getAllUserIds() const {
         }
     }
 
+    std::sort(userIds.begin(), userIds.end());
+
     return userIds;
+}
+
+bool RatingManager::hasRating(int userId, int movieId) const {
+    for (const Rating& rating : ratings) {
+        if (rating.getUserId() == userId && rating.getMovieId() == movieId) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void RatingManager::loadFromFile(const std::string& filename) {
@@ -99,8 +139,14 @@ void RatingManager::loadFromFile(const std::string& filename) {
         std::getline(ss, token, ',');
         score = std::stod(token);
 
-        ratings.push_back(Rating(userId, movieId, score));
+        Rating rating(userId, movieId, score);
+
+        if (rating.isValid() && !hasRating(userId, movieId)) {
+            ratings.push_back(rating);
+        }
     }
+
+    sortRatingsByUserAndMovie();
 
     file.close();
 
@@ -118,9 +164,11 @@ void RatingManager::saveToFile(const std::string& filename) const {
     file << "userId,movieId,score" << std::endl;
 
     for (const Rating& rating : ratings) {
-        file << rating.getUserId() << ","
-             << rating.getMovieId() << ","
-             << rating.getScore() << std::endl;
+        if (rating.isValid()) {
+            file << rating.getUserId() << ","
+                 << rating.getMovieId() << ","
+                 << rating.getScore() << std::endl;
+        }
     }
 
     file.close();

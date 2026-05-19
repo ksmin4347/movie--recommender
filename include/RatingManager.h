@@ -9,8 +9,10 @@ class RatingManager : public BaseManager {
 private:
     std::vector<Rating> ratings;
 
+    void sortRatingsByUserAndMovie();
+
 public:
-    void addRating(int userId, int movieId, double score);
+    bool addRating(int userId, int movieId, double score);
 
     void printAllRatings() const;
 
@@ -21,6 +23,8 @@ public:
     std::vector<Rating> findByUser(int userId) const;
 
     std::vector<int> getAllUserIds() const;
+
+    bool hasRating(int userId, int movieId) const;
 
     void loadFromFile(const std::string& filename) override;
     void saveToFile(const std::string& filename) const override;

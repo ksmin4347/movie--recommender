@@ -1,12 +1,10 @@
 #include "MovieManager.h"
 #include "UserManager.h"
 #include "RatingManager.h"
-#include "SimilarityCalculator.h"
+#include "Recommender.h"
 #include <iostream>
 #include <string>
 #include <vector>
-#include <iomanip>
-#include <cmath>
 
 void printMenu() {
     std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
@@ -19,7 +17,8 @@ void printMenu() {
     std::cout << "7. 평점 입력" << std::endl;
     std::cout << "8. 특정 영화의 평점 목록 출력" << std::endl;
     std::cout << "9. 전체 평점 목록 출력" << std::endl;
-    std::cout << "10. 가장 비슷한 사용자 찾기" << std::endl;
+    std::cout << "10. 사용자 유사도 비교" << std::endl;
+    std::cout << "11. 영화 추천" << std::endl;
     std::cout << "0. 종료" << std::endl;
     std::cout << "메뉴 선택: ";
 }
@@ -39,6 +38,8 @@ int main() {
         }
     }
 
+    Recommender recommender(movieManager, ratingManager);
+
     int choice;
 
     do {
@@ -46,8 +47,10 @@ int main() {
         std::cin >> choice;
 
         if (choice == 1) {
-            int id, year;
-            std::string title, genre;
+            int id;
+            int year;
+            std::string title;
+            std::string genre;
 
             std::cout << "영화 ID: ";
             std::cin >> id;
@@ -67,6 +70,7 @@ int main() {
 
         else if (choice == 2) {
             std::string title;
+
             std::cin.ignore();
 
             std::cout << "검색할 제목: ";
@@ -85,7 +89,8 @@ int main() {
 
         else if (choice == 5) {
             int id;
-            std::string name, email;
+            std::string name;
+            std::string email;
 
             std::cout << "사용자 ID: ";
             std::cin >> id;
@@ -105,7 +110,8 @@ int main() {
         }
 
         else if (choice == 7) {
-            int userId, movieId;
+            int userId;
+            int movieId;
             double score;
 
             std::cout << "사용자 ID: ";
@@ -132,10 +138,17 @@ int main() {
                 continue;
             }
 
-            ratingManager.addRating(userId, movieId, score);
-            movieManager.addRatingToMovie(movieId, score);
+            if (ratingManager.hasRating(userId, movieId)) {
+                std::cout << "이미 해당 사용자가 이 영화에 평점을 입력했습니다." << std::endl;
+                continue;
+            }
 
-            std::cout << "평점이 정상적으로 입력되었습니다." << std::endl;
+            if (ratingManager.addRating(userId, movieId, score)) {
+                movieManager.addRatingToMovie(movieId, score);
+                std::cout << "평점이 정상적으로 입력되었습니다." << std::endl;
+            } else {
+                std::cout << "평점 저장에 실패했습니다." << std::endl;
+            }
         }
 
         else if (choice == 8) {
@@ -162,55 +175,45 @@ int main() {
                 continue;
             }
 
-            std::vector<Rating> targetRatings = ratingManager.findByUser(targetUserId);
+            recommender.printSimilarityReport(targetUserId);
+        }
 
-            if (targetRatings.empty()) {
-                std::cout << "해당 사용자의 평점 데이터가 없습니다." << std::endl;
+        else if (choice == 11) {
+            int targetUserId;
+
+            std::cout << "추천 받을 사용자 ID 입력: ";
+            std::cin >> targetUserId;
+
+            if (!userManager.hasUser(targetUserId)) {
+                std::cout << "존재하지 않는 사용자 ID입니다." << std::endl;
                 continue;
             }
 
-            double bestSimilarity = -101.0;
-            std::vector<int> bestUserIds;
+            std::vector<Rating> targetRatings =
+                ratingManager.findByUser(targetUserId);
 
-            std::vector<int> userIds = ratingManager.getAllUserIds();
-
-            std::cout << std::fixed << std::setprecision(1);
-            std::cout << "\n--- 유사도 계산 결과 ---" << std::endl;
-
-            for (int otherUserId : userIds) {
-                if (otherUserId == targetUserId) {
-                    continue;
-                }
-
-                std::vector<Rating> otherRatings = ratingManager.findByUser(otherUserId);
-
-                double similarity = SimilarityCalculator::calculate(
-                    targetRatings,
-                    otherRatings
-                );
-
-                std::cout << "사용자 " << targetUserId
-                          << " ↔ 사용자 " << otherUserId
-                          << " 유사도: " << similarity << std::endl;
-
-                if (similarity > bestSimilarity) {
-                    bestSimilarity = similarity;
-                    bestUserIds.clear();
-                    bestUserIds.push_back(otherUserId);
-                } else if (std::abs(similarity - bestSimilarity) < 0.000001) {
-                    bestUserIds.push_back(otherUserId);
-                }
+            if (targetRatings.empty()) {
+                std::cout << "해당 사용자의 평점 데이터가 없어 추천할 수 없습니다."
+                          << std::endl;
+                continue;
             }
 
-            if (bestUserIds.empty() || bestSimilarity <= -100.0) {
-                std::cout << "비교 가능한 유사 사용자가 없습니다." << std::endl;
-            } else {
-                std::cout << "\n가장 비슷한 사용자:" << std::endl;
+            std::cout << "\n=== 사용자 기반 추천 ===" << std::endl;
+            recommender.printRecommendations(targetUserId, 3, 5);
 
-                for (int userId : bestUserIds) {
-                    std::cout << "사용자 " << userId
-                              << " (유사도 " << bestSimilarity << ")"
-                              << std::endl;
+            std::cout << "\n=== 장르 기반 추천 ===" << std::endl;
+
+            std::vector<Movie> genreRecommendations =
+                movieManager.recommend(targetRatings, 5);
+
+            if (genreRecommendations.empty()) {
+                std::cout << "장르 기반으로 추천할 영화가 없습니다." << std::endl;
+            } else {
+                int rank = 1;
+
+                for (const Movie& movie : genreRecommendations) {
+                    std::cout << rank << ". " << movie << std::endl;
+                    rank++;
                 }
             }
         }

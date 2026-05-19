@@ -9,6 +9,8 @@ class UserManager : public BaseManager {
 private:
     std::vector<User> users;
 
+    void sortUsersById();
+
 public:
     void addUser(int id, const std::string& name, const std::string& email);
 
