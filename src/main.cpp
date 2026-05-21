@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-void printMenu() {
+void printMenu() {      //main은 메뉴와 사용자 입력 흐름 담당, 실제 데이터 관리와 추천 계산은 manager랑 recommder가 담당
     std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
     std::cout << "1. 영화 추가" << std::endl;
     std::cout << "2. 제목으로 영화 검색" << std::endl;
@@ -37,7 +37,7 @@ int main() {
             movieManager.addRatingToMovie(rating.getMovieId(), rating.getScore());
         }
     }
-
+    //영화 평균 평점 재계산->recommender 생성->do while로 메뉴 출력
     Recommender recommender(movieManager, ratingManager);
 
     int choice;
@@ -170,12 +170,12 @@ int main() {
             std::cout << "기준 사용자 ID 입력: ";
             std::cin >> targetUserId;
 
-            if (!userManager.hasUser(targetUserId)) {
+            if (!userManager.hasUser(targetUserId)) {       //존재 확인
                 std::cout << "존재하지 않는 사용자 ID입니다." << std::endl;
                 continue;
             }
 
-            recommender.printSimilarityReport(targetUserId);
+            recommender.printSimilarityReport(targetUserId);    //유사도 출력
         }
 
         else if (choice == 11) {
@@ -210,27 +210,36 @@ int main() {
                 std::cout << "장르 기반으로 추천할 영화가 없습니다." << std::endl;
             } else {
                 int rank = 1;
-
                 for (const Movie& movie : genreRecommendations) {
                     std::cout << rank << ". " << movie << std::endl;
                     rank++;
                 }
             }
         }
-
         else if (choice == 0) {
             std::cout << "프로그램을 종료합니다." << std::endl;
         }
-
         else {
             std::cout << "잘못된 메뉴입니다." << std::endl;
         }
-
     } while (choice != 0);
-
     movieManager.saveToFile("data/movies.csv");
     userManager.saveToFile("data/users.csv");
     ratingManager.saveToFile("data/ratings.csv");
 
     return 0;
 }
+
+/*
+엣지 케이스 처리
+1. 존재하지 않는 사용자 ID
+2. 존재하지 않는 영화 ID
+3. 평점 범위 초과
+4. 중복 평점
+5. 평점이 없는 사용자
+6. 공통 영화가 없는 사용자 쌍
+7. 추천할 영화가 없는 경우
+8. 추천 영화가 N개보다 적은 경우
+9. 유사 사용자 K명보다 적은 경우
+10. 최고 유사도 동점 사용자 여러 명
+*/

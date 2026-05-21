@@ -19,11 +19,11 @@ void RatingManager::sortRatingsByUserAndMovie() {
 bool RatingManager::addRating(int userId, int movieId, double score) {
     Rating rating(userId, movieId, score);
 
-    if (!rating.isValid()) {
+    if (!rating.isValid()) {    //평점이 유효하지 않으면 false  
         return false;
     }
 
-    if (hasRating(userId, movieId)) {
+    if (hasRating(userId, movieId)) {   //이미 같은 유저가 영화를 평가했으면 false
         return false;
     }
 
@@ -63,7 +63,7 @@ const std::vector<Rating>& RatingManager::getRatings() const {
     return ratings;
 }
 
-std::vector<Rating> RatingManager::findByUser(int userId) const {
+std::vector<Rating> RatingManager::findByUser(int userId) const {   //특정 사용자가 남긴 평점 목록만 반환
     std::vector<Rating> result;
 
     for (const Rating& rating : ratings) {
@@ -75,19 +75,19 @@ std::vector<Rating> RatingManager::findByUser(int userId) const {
     return result;
 }
 
-std::vector<int> RatingManager::getAllUserIds() const {
-    std::vector<int> userIds;
+std::vector<int> RatingManager::getAllUserIds() const { //평점을 남긴 사용자 ID 목록을 중복 없이 반환
+    std::vector<int> userIds;       //중복 없는 사용자 id를 저장할 벡터
 
-    for (const Rating& rating : ratings) {
-        if (!rating.isValid()) {
+    for (const Rating& rating : ratings) {//평점 목록 하나씩 확인
+        if (!rating.isValid()) {    //유효하지 않으면 건너뛰기
             continue;
         }
 
-        int userId = rating.getUserId();
+        int userId = rating.getUserId();    //현재 평점의 사용자 id 가져옴
 
-        if (std::find(userIds.begin(), userIds.end(), userId) == userIds.end()) {
-            userIds.push_back(userId);
-        }
+        if (std::find(userIds.begin(), userIds.end(), userId) == userIds.end()) {   //find(시작,끝,찾을값)
+            userIds.push_back(userId);                                        //찾으면 그 위치 반환, 못찾으면 end()반환
+        }                                                                   //못찾으면 그 아이디 저장
     }
 
     std::sort(userIds.begin(), userIds.end());
