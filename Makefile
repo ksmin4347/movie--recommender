@@ -12,6 +12,7 @@ OBJDIR = obj
 
 # object files
 OBJS = $(OBJDIR)/main.o \
+       $(OBJDIR)/MovieRecommenderApp.o \
        $(OBJDIR)/Movie.o \
        $(OBJDIR)/User.o \
        $(OBJDIR)/Rating.o \
@@ -27,7 +28,10 @@ $(TARGET): $(OBJS)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(INCDIR)/MovieManager.h $(INCDIR)/UserManager.h $(INCDIR)/RatingManager.h $(INCDIR)/Recommender.h $(INCDIR)/Constants.h | $(OBJDIR)
+$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(INCDIR)/MovieRecommenderApp.h | $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJDIR)/MovieRecommenderApp.o: $(SRCDIR)/MovieRecommenderApp.cpp $(INCDIR)/MovieRecommenderApp.h $(INCDIR)/MovieManager.h $(INCDIR)/UserManager.h $(INCDIR)/RatingManager.h $(INCDIR)/Recommender.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/Movie.o: $(SRCDIR)/Movie.cpp $(INCDIR)/Movie.h $(INCDIR)/Constants.h | $(OBJDIR)
