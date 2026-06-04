@@ -2,11 +2,32 @@
 #include "UserManager.h"
 #include "RatingManager.h"
 #include "Recommender.h"
+#include "Constants.h"
 #include <iostream>
 #include <string>
 #include <vector>
+#include <limits>
 
-void printMenu() {      //main은 메뉴와 사용자 입력 흐름 담당, 실제 데이터 관리와 추천 계산은 manager랑 recommder가 담당
+namespace MenuOption {
+    constexpr int EXIT = 0;
+    constexpr int ADD_MOVIE = 1;
+    constexpr int SEARCH_MOVIE = 2;
+    constexpr int PRINT_ALL_MOVIES = 3;
+    constexpr int PRINT_MOVIES_BY_RATING = 4;
+    constexpr int ADD_USER = 5;
+    constexpr int PRINT_ALL_USERS = 6;
+    constexpr int ADD_RATING = 7;
+    constexpr int PRINT_RATINGS_BY_MOVIE = 8;
+    constexpr int PRINT_ALL_RATINGS = 9;
+    constexpr int COMPARE_USER_SIMILARITY = 10;
+    constexpr int RECOMMEND_MOVIES = 11;
+}
+
+void clearInputLine() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+void printMenu() {
     std::cout << "\n===== Movie Recommender Menu =====" << std::endl;
     std::cout << "1. 영화 추가" << std::endl;
     std::cout << "2. 제목으로 영화 검색" << std::endl;
@@ -34,10 +55,13 @@ int main() {
 
     for (const Rating& rating : ratingManager.getRatings()) {
         if (rating.isValid()) {
-            movieManager.addRatingToMovie(rating.getMovieId(), rating.getScore());
+            movieManager.addRatingToMovie(
+                rating.getMovieId(),
+                rating.getScore()
+            );
         }
     }
-    //영화 평균 평점 재계산->recommender 생성->do while로 메뉴 출력
+
     Recommender recommender(movieManager, ratingManager);
 
     int choice;
@@ -46,7 +70,7 @@ int main() {
         printMenu();
         std::cin >> choice;
 
-        if (choice == 1) {
+        if (choice == MenuOption::ADD_MOVIE) {
             int id;
             int year;
             std::string title;
@@ -54,7 +78,7 @@ int main() {
 
             std::cout << "영화 ID: ";
             std::cin >> id;
-            std::cin.ignore();
+            clearInputLine();
 
             std::cout << "영화 제목: ";
             std::getline(std::cin, title);
@@ -68,10 +92,10 @@ int main() {
             movieManager.addMovie(id, title, genre, year);
         }
 
-        else if (choice == 2) {
+        else if (choice == MenuOption::SEARCH_MOVIE) {
             std::string title;
 
-            std::cin.ignore();
+            clearInputLine();
 
             std::cout << "검색할 제목: ";
             std::getline(std::cin, title);
@@ -79,22 +103,22 @@ int main() {
             movieManager.searchByTitle(title);
         }
 
-        else if (choice == 3) {
+        else if (choice == MenuOption::PRINT_ALL_MOVIES) {
             movieManager.printAllMovies();
         }
 
-        else if (choice == 4) {
+        else if (choice == MenuOption::PRINT_MOVIES_BY_RATING) {
             movieManager.printMoviesSortedByRating();
         }
 
-        else if (choice == 5) {
+        else if (choice == MenuOption::ADD_USER) {
             int id;
             std::string name;
             std::string email;
 
             std::cout << "사용자 ID: ";
             std::cin >> id;
-            std::cin.ignore();
+            clearInputLine();
 
             std::cout << "이름: ";
             std::getline(std::cin, name);
@@ -105,11 +129,11 @@ int main() {
             userManager.addUser(id, name, email);
         }
 
-        else if (choice == 6) {
+        else if (choice == MenuOption::PRINT_ALL_USERS) {
             userManager.printAllUsers();
         }
 
-        else if (choice == 7) {
+        else if (choice == MenuOption::ADD_RATING) {
             int userId;
             int movieId;
             double score;
@@ -133,13 +157,20 @@ int main() {
                 continue;
             }
 
-            if (score < 0.0 || score > 5.0) {
-                std::cout << "평점은 0.0 이상 5.0 이하만 입력할 수 있습니다." << std::endl;
+            if (score < AppConstants::MIN_RATING ||
+                score > AppConstants::MAX_RATING) {
+                std::cout << "평점은 "
+                          << AppConstants::MIN_RATING
+                          << " 이상 "
+                          << AppConstants::MAX_RATING
+                          << " 이하만 입력할 수 있습니다."
+                          << std::endl;
                 continue;
             }
 
             if (ratingManager.hasRating(userId, movieId)) {
-                std::cout << "이미 해당 사용자가 이 영화에 평점을 입력했습니다." << std::endl;
+                std::cout << "이미 해당 사용자가 이 영화에 평점을 입력했습니다."
+                          << std::endl;
                 continue;
             }
 
@@ -151,7 +182,7 @@ int main() {
             }
         }
 
-        else if (choice == 8) {
+        else if (choice == MenuOption::PRINT_RATINGS_BY_MOVIE) {
             int movieId;
 
             std::cout << "영화 ID 입력: ";
@@ -160,25 +191,25 @@ int main() {
             ratingManager.printRatingsByMovie(movieId);
         }
 
-        else if (choice == 9) {
+        else if (choice == MenuOption::PRINT_ALL_RATINGS) {
             ratingManager.printAllRatings();
         }
 
-        else if (choice == 10) {
+        else if (choice == MenuOption::COMPARE_USER_SIMILARITY) {
             int targetUserId;
 
             std::cout << "기준 사용자 ID 입력: ";
             std::cin >> targetUserId;
 
-            if (!userManager.hasUser(targetUserId)) {       //존재 확인
+            if (!userManager.hasUser(targetUserId)) {
                 std::cout << "존재하지 않는 사용자 ID입니다." << std::endl;
                 continue;
             }
 
-            recommender.printSimilarityReport(targetUserId);    //유사도 출력
+            recommender.printSimilarityReport(targetUserId);
         }
 
-        else if (choice == 11) {
+        else if (choice == MenuOption::RECOMMEND_MOVIES) {
             int targetUserId;
 
             std::cout << "추천 받을 사용자 ID 입력: ";
@@ -198,48 +229,48 @@ int main() {
                 continue;
             }
 
-            std::cout << "\n=== 사용자 기반 추천 ===" << std::endl;
-            recommender.printRecommendations(targetUserId, 3, 5);
+            std::cout << "\n=== 사용자 기반 협업 필터링 추천 ===" << std::endl;
 
-            std::cout << "\n=== 장르 기반 추천 ===" << std::endl;
+            recommender.printRecommendations(
+                targetUserId,
+                AppConstants::DEFAULT_SIMILAR_USER_COUNT,
+                AppConstants::DEFAULT_RECOMMENDATION_COUNT
+            );
+
+            std::cout << "\n=== 장르 기반 추천 MovieManager::recommend() ==="
+                      << std::endl;
 
             std::vector<Movie> genreRecommendations =
-                movieManager.recommend(targetRatings, 5);
+                movieManager.recommend(
+                    targetRatings,
+                    AppConstants::DEFAULT_RECOMMENDATION_COUNT
+                );
 
             if (genreRecommendations.empty()) {
                 std::cout << "장르 기반으로 추천할 영화가 없습니다." << std::endl;
             } else {
                 int rank = 1;
+
                 for (const Movie& movie : genreRecommendations) {
                     std::cout << rank << ". " << movie << std::endl;
                     rank++;
                 }
             }
         }
-        else if (choice == 0) {
+
+        else if (choice == MenuOption::EXIT) {
             std::cout << "프로그램을 종료합니다." << std::endl;
         }
+
         else {
             std::cout << "잘못된 메뉴입니다." << std::endl;
         }
-    } while (choice != 0);
+
+    } while (choice != MenuOption::EXIT);
+
     movieManager.saveToFile("data/movies.csv");
     userManager.saveToFile("data/users.csv");
     ratingManager.saveToFile("data/ratings.csv");
 
     return 0;
 }
-
-/*
-엣지 케이스 처리
-1. 존재하지 않는 사용자 ID
-2. 존재하지 않는 영화 ID
-3. 평점 범위 초과
-4. 중복 평점
-5. 평점이 없는 사용자
-6. 공통 영화가 없는 사용자 쌍
-7. 추천할 영화가 없는 경우
-8. 추천 영화가 N개보다 적은 경우
-9. 유사 사용자 K명보다 적은 경우
-10. 최고 유사도 동점 사용자 여러 명
-*/

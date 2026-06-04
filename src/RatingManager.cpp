@@ -1,8 +1,8 @@
 #include "RatingManager.h"
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <algorithm>
+#include <exception>
 
 void RatingManager::sortRatingsByUserAndMovie() {
     std::sort(ratings.begin(), ratings.end(),
@@ -19,11 +19,11 @@ void RatingManager::sortRatingsByUserAndMovie() {
 bool RatingManager::addRating(int userId, int movieId, double score) {
     Rating rating(userId, movieId, score);
 
-    if (!rating.isValid()) {    //평점이 유효하지 않으면 false  
+    if (!rating.isValid()) {
         return false;
     }
 
-    if (hasRating(userId, movieId)) {   //이미 같은 유저가 영화를 평가했으면 false
+    if (hasRating(userId, movieId)) {
         return false;
     }
 
@@ -63,7 +63,7 @@ const std::vector<Rating>& RatingManager::getRatings() const {
     return ratings;
 }
 
-std::vector<Rating> RatingManager::findByUser(int userId) const {   //특정 사용자가 남긴 평점 목록만 반환
+std::vector<Rating> RatingManager::findByUser(int userId) const {
     std::vector<Rating> result;
 
     for (const Rating& rating : ratings) {
@@ -75,19 +75,19 @@ std::vector<Rating> RatingManager::findByUser(int userId) const {   //특정 사
     return result;
 }
 
-std::vector<int> RatingManager::getAllUserIds() const { //평점을 남긴 사용자 ID 목록을 중복 없이 반환
-    std::vector<int> userIds;       //중복 없는 사용자 id를 저장할 벡터
+std::vector<int> RatingManager::getAllUserIds() const {
+    std::vector<int> userIds;
 
-    for (const Rating& rating : ratings) {//평점 목록 하나씩 확인
-        if (!rating.isValid()) {    //유효하지 않으면 건너뛰기
+    for (const Rating& rating : ratings) {
+        if (!rating.isValid()) {
             continue;
         }
 
-        int userId = rating.getUserId();    //현재 평점의 사용자 id 가져옴
+        int userId = rating.getUserId();
 
-        if (std::find(userIds.begin(), userIds.end(), userId) == userIds.end()) {   //find(시작,끝,찾을값)
-            userIds.push_back(userId);                                        //찾으면 그 위치 반환, 못찾으면 end()반환
-        }                                                                   //못찾으면 그 아이디 저장
+        if (std::find(userIds.begin(), userIds.end(), userId) == userIds.end()) {
+            userIds.push_back(userId);
+        }
     }
 
     std::sort(userIds.begin(), userIds.end());
@@ -97,7 +97,8 @@ std::vector<int> RatingManager::getAllUserIds() const { //평점을 남긴 사�
 
 bool RatingManager::hasRating(int userId, int movieId) const {
     for (const Rating& rating : ratings) {
-        if (rating.getUserId() == userId && rating.getMovieId() == movieId) {
+        if (rating.getUserId() == userId &&
+            rating.getMovieId() == movieId) {
             return true;
         }
     }
@@ -106,58 +107,56 @@ bool RatingManager::hasRating(int userId, int movieId) const {
 }
 
 void RatingManager::loadFromFile(const std::string& filename) {
-    std::ifstream file(filename);
+    std::ifstream file;
 
-    if (!file.is_open()) {
-        std::cerr << "Error: " << filename << " 파일을 열 수 없습니다." << std::endl;
+    if (!openInputFile(file, filename)) {
         return;
     }
 
     ratings.clear();
+    skipHeader(file);
 
     std::string line;
-    std::getline(file, line);
 
     while (std::getline(file, line)) {
         if (line.empty()) {
             continue;
         }
 
-        std::stringstream ss(line);
-        std::string token;
+        std::vector<std::string> fields = splitCsvLine(line);
 
-        int userId;
-        int movieId;
-        double score;
+        if (fields.size() != 3) {
+            std::cerr << "CSV 형식 오류: " << line << std::endl;
+            continue;
+        }
 
-        std::getline(ss, token, ',');
-        userId = std::stoi(token);
+        try {
+            int userId = std::stoi(fields[0]);
+            int movieId = std::stoi(fields[1]);
+            double score = std::stod(fields[2]);
 
-        std::getline(ss, token, ',');
-        movieId = std::stoi(token);
+            Rating rating(userId, movieId, score);
 
-        std::getline(ss, token, ',');
-        score = std::stod(token);
-
-        Rating rating(userId, movieId, score);
-
-        if (rating.isValid() && !hasRating(userId, movieId)) {
-            ratings.push_back(rating);
+            if (rating.isValid() && !hasRating(userId, movieId)) {
+                ratings.push_back(rating);
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "CSV 파싱 오류: " << line
+                      << " (" << e.what() << ")"
+                      << std::endl;
         }
     }
 
     sortRatingsByUserAndMovie();
-
     file.close();
 
-    std::cout << filename << " 로드 완료: " << ratings.size() << "건" << std::endl;
+    printLoadComplete(filename, size());
 }
 
 void RatingManager::saveToFile(const std::string& filename) const {
-    std::ofstream file(filename);
+    std::ofstream file;
 
-    if (!file.is_open()) {
-        std::cerr << "Error: " << filename << " 파일 저장 실패" << std::endl;
+    if (!openOutputFile(file, filename)) {
         return;
     }
 
@@ -173,7 +172,7 @@ void RatingManager::saveToFile(const std::string& filename) const {
 
     file.close();
 
-    std::cout << filename << " 저장 완료: " << ratings.size() << "건" << std::endl;
+    printSaveComplete(filename, size());
 }
 
 int RatingManager::size() const {

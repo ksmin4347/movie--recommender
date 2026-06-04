@@ -1,8 +1,8 @@
 #include "UserManager.h"
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <algorithm>
+#include <exception>
 
 void UserManager::sortUsersById() {
     std::sort(users.begin(), users.end(),
@@ -12,7 +12,8 @@ void UserManager::sortUsersById() {
     );
 }
 
-void UserManager::addUser(int id, const std::string& name, const std::string& email) {
+void UserManager::addUser(int id, const std::string& name,
+                          const std::string& email) {
     for (const User& user : users) {
         if (user.getId() == id) {
             std::cout << "이미 존재하는 사용자 ID입니다." << std::endl;
@@ -48,52 +49,52 @@ bool UserManager::hasUser(int userId) const {
 }
 
 void UserManager::loadFromFile(const std::string& filename) {
-    std::ifstream file(filename);
+    std::ifstream file;
 
-    if (!file.is_open()) {
-        std::cerr << "Error: " << filename << " 파일을 열 수 없습니다." << std::endl;
+    if (!openInputFile(file, filename)) {
         return;
     }
 
     users.clear();
+    skipHeader(file);
 
     std::string line;
-    std::getline(file, line);
 
     while (std::getline(file, line)) {
         if (line.empty()) {
             continue;
         }
 
-        std::stringstream ss(line);
-        std::string token;
+        std::vector<std::string> fields = splitCsvLine(line);
 
-        int id;
-        std::string name;
-        std::string email;
+        if (fields.size() != 3) {
+            std::cerr << "CSV 형식 오류: " << line << std::endl;
+            continue;
+        }
 
-        std::getline(ss, token, ',');
-        id = std::stoi(token);
+        try {
+            int id = std::stoi(fields[0]);
+            std::string name = fields[1];
+            std::string email = fields[2];
 
-        std::getline(ss, name, ',');
-
-        std::getline(ss, email, ',');
-
-        users.push_back(User(id, name, email));
+            users.push_back(User(id, name, email));
+        } catch (const std::exception& e) {
+            std::cerr << "CSV 파싱 오류: " << line
+                      << " (" << e.what() << ")"
+                      << std::endl;
+        }
     }
 
     sortUsersById();
-
     file.close();
 
-    std::cout << filename << " 로드 완료: " << users.size() << "건" << std::endl;
+    printLoadComplete(filename, size());
 }
 
 void UserManager::saveToFile(const std::string& filename) const {
-    std::ofstream file(filename);
+    std::ofstream file;
 
-    if (!file.is_open()) {
-        std::cerr << "Error: " << filename << " 파일 저장 실패" << std::endl;
+    if (!openOutputFile(file, filename)) {
         return;
     }
 
@@ -107,7 +108,7 @@ void UserManager::saveToFile(const std::string& filename) const {
 
     file.close();
 
-    std::cout << filename << " 저장 완료: " << users.size() << "건" << std::endl;
+    printSaveComplete(filename, size());
 }
 
 int UserManager::size() const {

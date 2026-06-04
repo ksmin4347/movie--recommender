@@ -27,19 +27,19 @@ $(TARGET): $(OBJS)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(INCDIR)/MovieManager.h $(INCDIR)/UserManager.h $(INCDIR)/RatingManager.h $(INCDIR)/Recommender.h | $(OBJDIR)
+$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(INCDIR)/MovieManager.h $(INCDIR)/UserManager.h $(INCDIR)/RatingManager.h $(INCDIR)/Recommender.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJDIR)/Movie.o: $(SRCDIR)/Movie.cpp $(INCDIR)/Movie.h | $(OBJDIR)
+$(OBJDIR)/Movie.o: $(SRCDIR)/Movie.cpp $(INCDIR)/Movie.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/User.o: $(SRCDIR)/User.cpp $(INCDIR)/User.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJDIR)/Rating.o: $(SRCDIR)/Rating.cpp $(INCDIR)/Rating.h | $(OBJDIR)
+$(OBJDIR)/Rating.o: $(SRCDIR)/Rating.cpp $(INCDIR)/Rating.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJDIR)/MovieManager.o: $(SRCDIR)/MovieManager.cpp $(INCDIR)/MovieManager.h $(INCDIR)/Movie.h $(INCDIR)/Rating.h $(INCDIR)/BaseManager.h | $(OBJDIR)
+$(OBJDIR)/MovieManager.o: $(SRCDIR)/MovieManager.cpp $(INCDIR)/MovieManager.h $(INCDIR)/Movie.h $(INCDIR)/Rating.h $(INCDIR)/BaseManager.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/UserManager.o: $(SRCDIR)/UserManager.cpp $(INCDIR)/UserManager.h $(INCDIR)/User.h $(INCDIR)/BaseManager.h | $(OBJDIR)
@@ -48,10 +48,10 @@ $(OBJDIR)/UserManager.o: $(SRCDIR)/UserManager.cpp $(INCDIR)/UserManager.h $(INC
 $(OBJDIR)/RatingManager.o: $(SRCDIR)/RatingManager.cpp $(INCDIR)/RatingManager.h $(INCDIR)/Rating.h $(INCDIR)/BaseManager.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJDIR)/SimilarityCalculator.o: $(SRCDIR)/SimilarityCalculator.cpp $(INCDIR)/SimilarityCalculator.h $(INCDIR)/Rating.h | $(OBJDIR)
+$(OBJDIR)/SimilarityCalculator.o: $(SRCDIR)/SimilarityCalculator.cpp $(INCDIR)/SimilarityCalculator.h $(INCDIR)/Rating.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJDIR)/Recommender.o: $(SRCDIR)/Recommender.cpp $(INCDIR)/Recommender.h $(INCDIR)/MovieManager.h $(INCDIR)/RatingManager.h $(INCDIR)/SimilarityCalculator.h | $(OBJDIR)
+$(OBJDIR)/Recommender.o: $(SRCDIR)/Recommender.cpp $(INCDIR)/Recommender.h $(INCDIR)/MovieManager.h $(INCDIR)/RatingManager.h $(INCDIR)/SimilarityCalculator.h $(INCDIR)/Constants.h | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean run

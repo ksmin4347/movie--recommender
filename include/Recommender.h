@@ -3,6 +3,7 @@
 #include "MovieManager.h"
 #include "RatingManager.h"
 #include "SimilarityCalculator.h"
+#include "Constants.h"
 #include <vector>
 #include <utility>
 
@@ -20,13 +21,13 @@ public:
 
     std::vector<std::pair<int, double>> findSimilarUsers(
         int targetUserId,
-        int k = 3
+        int k = AppConstants::DEFAULT_SIMILAR_USER_COUNT
     ) const;
 
     std::vector<int> recommend(
         int targetUserId,
-        int k = 3,
-        int n = 5
+        int k = AppConstants::DEFAULT_SIMILAR_USER_COUNT,
+        int n = AppConstants::DEFAULT_RECOMMENDATION_COUNT
     ) const;
 
     void printSimilarityReport(
@@ -35,7 +36,7 @@ public:
 
     void printRecommendations(
         int targetUserId,
-        int k = 3,
-        int n = 5
+        int k = AppConstants::DEFAULT_SIMILAR_USER_COUNT,
+        int n = AppConstants::DEFAULT_RECOMMENDATION_COUNT
     ) const;
 };
