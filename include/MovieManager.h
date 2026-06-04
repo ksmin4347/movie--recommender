@@ -13,6 +13,8 @@ private:
 
     void sortMoviesById();
 
+    std::string normalizeText(const std::string& text) const;
+
 public:
     void addMovie(int id, const std::string& title,
                   const std::string& genre, int year);

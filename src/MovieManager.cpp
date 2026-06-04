@@ -15,6 +15,24 @@ void MovieManager::sortMoviesById() {
     );
 }
 
+std::string MovieManager::normalizeText(const std::string& text) const {
+    std::string result;
+
+    for (char ch : text) {
+        if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+            continue;
+        }
+
+        if (ch >= 'A' && ch <= 'Z') {
+            result.push_back(ch - 'A' + 'a');
+        } else {
+            result.push_back(ch);
+        }
+    }
+
+    return result;
+}
+
 void MovieManager::addMovie(int id, const std::string& title,
                             const std::string& genre, int year) {
     for (const Movie& movie : movies) {
@@ -42,10 +60,19 @@ void MovieManager::printAllMovies() const {
 }
 
 void MovieManager::searchByTitle(const std::string& title) const {
+    std::string keyword = normalizeText(title);
+
+    if (keyword.empty()) {
+        std::cout << "검색어를 입력해주세요." << std::endl;
+        return;
+    }
+
     bool found = false;
 
     for (const Movie& movie : movies) {
-        if (movie.getTitle() == title) {
+        std::string movieTitle = normalizeText(movie.getTitle());
+
+        if (movieTitle.find(keyword) != std::string::npos) {
             std::cout << movie << std::endl;
             found = true;
         }
