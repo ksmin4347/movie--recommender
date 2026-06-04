@@ -97,6 +97,84 @@ void MovieManager::printMoviesSortedByRating() const {
     }
 }
 
+std::vector<Movie> MovieManager::filterByGenre(
+    const std::string& genre
+) const {
+    std::vector<Movie> result;
+
+    std::string keyword = normalizeText(genre);
+
+    if (keyword.empty()) {
+        return result;
+    }
+
+    for (const Movie& movie : movies) {
+        std::string movieGenre = normalizeText(movie.getGenre());
+
+        if (movieGenre.find(keyword) != std::string::npos ||
+            keyword.find(movieGenre) != std::string::npos) {
+            result.push_back(movie);
+        }
+    }
+
+    return result;
+}
+
+void MovieManager::printMoviesByGenre(const std::string& genre) const {
+    std::vector<Movie> filteredMovies = filterByGenre(genre);
+
+    if (normalizeText(genre).empty()) {
+        std::cout << "장르를 입력해주세요." << std::endl;
+        return;
+    }
+
+    if (filteredMovies.empty()) {
+        std::cout << "해당 장르의 영화가 없습니다." << std::endl;
+        return;
+    }
+
+    std::cout << "\n=== " << genre << " 장르 영화 목록 ===" << std::endl;
+
+    for (const Movie& movie : filteredMovies) {
+        std::cout << movie << std::endl;
+    }
+}
+
+std::vector<std::string> MovieManager::getAllGenres() const {
+    std::vector<std::string> genres;
+
+    for (const Movie& movie : movies) {
+        std::string genre = movie.getGenre();
+
+        if (genre.empty()) {
+            continue;
+        }
+
+        if (std::find(genres.begin(), genres.end(), genre) == genres.end()) {
+            genres.push_back(genre);
+        }
+    }
+
+    std::sort(genres.begin(), genres.end());
+
+    return genres;
+}
+
+void MovieManager::printAvailableGenres() const {
+    std::vector<std::string> genres = getAllGenres();
+
+    if (genres.empty()) {
+        std::cout << "등록된 장르가 없습니다." << std::endl;
+        return;
+    }
+
+    std::cout << "\n=== 선택 가능한 장르 목록 ===" << std::endl;
+
+    for (int i = 0; i < static_cast<int>(genres.size()); i++) {
+        std::cout << genres[i] << std::endl;
+    }
+}
+
 bool MovieManager::hasMovie(int movieId) const {
     return findById(movieId) != nullptr;
 }

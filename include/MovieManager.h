@@ -25,6 +25,14 @@ public:
 
     void printMoviesSortedByRating() const;
 
+    std::vector<Movie> filterByGenre(const std::string& genre) const;
+
+    void printMoviesByGenre(const std::string& genre) const;
+
+    std::vector<std::string> getAllGenres() const;
+
+    void printAvailableGenres() const;
+
     bool hasMovie(int movieId) const;
 
     bool addRatingToMovie(int movieId, double score);
