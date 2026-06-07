@@ -10,6 +10,34 @@
 Recommender::Recommender(MovieManager& movieMgr, RatingManager& ratingMgr)
     : movieManager(movieMgr), ratingManager(ratingMgr) {}
 
+std::vector<std::pair<int, double>> Recommender::findSupportUsersForMovie(
+    int targetUserId,
+    int movieId,
+    int k
+) const {
+    std::vector<std::pair<int, double>> supportUsers;
+
+    std::vector<std::pair<int, double>> similarUsers =
+        findSimilarUsers(targetUserId, k);
+
+    for (const auto& userSimilarity : similarUsers) {
+        int otherUserId = userSimilarity.first;
+
+        std::vector<Rating> otherRatings =
+            ratingManager.findByUser(otherUserId);
+
+        for (const Rating& rating : otherRatings) {
+            if (rating.getMovieId() == movieId &&
+                rating.getScore() >= AppConstants::HIGH_RATING_THRESHOLD) {
+                supportUsers.push_back({otherUserId, rating.getScore()});
+                break;
+            }
+        }
+    }
+
+    return supportUsers;
+}
+
 std::vector<std::pair<int, double>> Recommender::getAllSimilarities(
     int targetUserId
 ) const {
@@ -250,6 +278,9 @@ void Recommender::printRecommendations(
         return;
     }
 
+    std::cout << std::fixed
+              << std::setprecision(AppConstants::OUTPUT_PRECISION);
+
     std::cout << "\n=== 추천 영화 TOP " << n << " ===" << std::endl;
 
     int rank = 1;
@@ -259,8 +290,36 @@ void Recommender::printRecommendations(
 
         if (movie != nullptr) {
             std::cout << rank << ". " << *movie << std::endl;
+
+            std::vector<std::pair<int, double>> supportUsers =
+                findSupportUsersForMovie(targetUserId, movieId, k);
+
+            if (!supportUsers.empty()) {
+                std::cout << "   추천 이유: 유사 사용자 ";
+
+                for (int i = 0; i < static_cast<int>(supportUsers.size()); i++) {
+                    std::cout << supportUsers[i].first
+                              << "번("
+                              << supportUsers[i].second
+                              << "점)";
+
+                    if (i != static_cast<int>(supportUsers.size()) - 1) {
+                        std::cout << ", ";
+                    }
+                }
+
+                std::cout << "이 "
+                          << AppConstants::HIGH_RATING_THRESHOLD
+                          << "점 이상으로 평가했고, 사용자가 아직 평가하지 않은 영화입니다."
+                          << std::endl;
+            } else {
+                std::cout << "   추천 이유: 유사 사용자의 높은 평점을 기반으로 추천된 영화입니다."
+                          << std::endl;
+            }
         } else {
             std::cout << rank << ". 영화 ID " << movieId << std::endl;
+            std::cout << "   추천 이유: 영화 정보를 찾을 수 없지만 추천 후보로 계산되었습니다."
+                      << std::endl;
         }
 
         rank++;

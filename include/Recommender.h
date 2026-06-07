@@ -12,6 +12,12 @@ private:
     MovieManager& movieManager;
     RatingManager& ratingManager;
 
+    std::vector<std::pair<int, double>> findSupportUsersForMovie(
+        int targetUserId,
+        int movieId,
+        int k = AppConstants::DEFAULT_SIMILAR_USER_COUNT
+    ) const;
+
 public:
     Recommender(MovieManager& movieMgr, RatingManager& ratingMgr);
 

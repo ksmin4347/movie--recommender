@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <iomanip>
 
 namespace MenuOption {
     constexpr int EXIT = 0;
@@ -257,10 +258,26 @@ void MovieRecommenderApp::handleRecommendation() {
     if (genreRecommendations.empty()) {
         std::cout << "장르 기반으로 추천할 영화가 없습니다." << std::endl;
     } else {
+        std::cout << std::fixed
+                  << std::setprecision(AppConstants::OUTPUT_PRECISION);
+
         int rank = 1;
 
         for (const Movie& movie : genreRecommendations) {
+            double genrePreference =
+                movieManager.calculateGenreSimilarity(
+                    movie.getGenre(),
+                    targetRatings
+                );
+
             std::cout << rank << ". " << movie << std::endl;
+            std::cout << "   추천 이유: 사용자가 "
+                      << movie.getGenre()
+                      << " 장르 영화에 평균 "
+                      << genrePreference
+                      << "점의 높은 평가를 주었고, 아직 평가하지 않은 영화입니다."
+                      << std::endl;
+
             rank++;
         }
     }
