@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <utility>
 
 class MovieManager : public BaseManager {
 private:
@@ -45,6 +46,29 @@ public:
     void printAverageRatingByGenre() const;
 
     void printTopNMovies(int n) const;
+
+    double getUserAverageRating(
+        const std::vector<Rating>& userRatings
+    ) const;
+
+    std::map<std::string, double> getUserAverageRatingByGenre(
+        const std::vector<Rating>& userRatings
+    ) const;
+
+    std::vector<std::pair<std::string, double>> getUserTopGenres(
+        const std::vector<Rating>& userRatings,
+        int n = AppConstants::DEFAULT_PROFILE_GENRE_COUNT
+    ) const;
+
+    std::vector<std::pair<Movie, double>> getUserTopRatedMovies(
+        const std::vector<Rating>& userRatings,
+        int n = AppConstants::DEFAULT_PROFILE_MOVIE_COUNT
+    ) const;
+
+    void printUserPreferenceProfile(
+        int userId,
+        const std::vector<Rating>& userRatings
+    ) const;
 
     bool hasMovie(int movieId) const;
 

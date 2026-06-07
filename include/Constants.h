@@ -18,5 +18,8 @@ namespace AppConstants {
     constexpr int DEFAULT_RECOMMENDATION_COUNT = 5;
     constexpr int DEFAULT_TOP_MOVIE_COUNT = 10;
 
+    constexpr int DEFAULT_PROFILE_GENRE_COUNT = 3;
+    constexpr int DEFAULT_PROFILE_MOVIE_COUNT = 5;
+
     constexpr int OUTPUT_PRECISION = 1;
 }

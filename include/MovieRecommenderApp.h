@@ -32,6 +32,7 @@ private:
     void handleRecommendation();
     void handleStatisticsMenu();
     void handleGenreFilter();
+    void handleUserPreferenceProfile();
 
 public:
     MovieRecommenderApp();

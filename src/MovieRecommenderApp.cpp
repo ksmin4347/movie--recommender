@@ -20,6 +20,7 @@ namespace MenuOption {
     constexpr int RECOMMEND_MOVIES = 11;
     constexpr int SHOW_STATISTICS = 12;
     constexpr int FILTER_BY_GENRE = 13;
+    constexpr int USER_PREFERENCE_PROFILE = 14;
 }
 
 namespace StatisticsOption {
@@ -77,6 +78,7 @@ void MovieRecommenderApp::printMenu() const {
     std::cout << "11. 영화 추천" << std::endl;
     std::cout << "12. 통계 보기" << std::endl;
     std::cout << "13. 장르별 영화 보기" << std::endl;
+    std::cout << "14. 사용자 취향 프로필" << std::endl;
     std::cout << "0. 종료" << std::endl;
     std::cout << "메뉴 선택: ";
 }
@@ -309,6 +311,23 @@ void MovieRecommenderApp::handleGenreFilter() {
     movieManager.printMoviesByGenre(genre);
 }
 
+void MovieRecommenderApp::handleUserPreferenceProfile() {
+    int userId;
+
+    std::cout << "취향을 분석할 사용자 ID 입력: ";
+    std::cin >> userId;
+
+    if (!userManager.hasUser(userId)) {
+        std::cout << "존재하지 않는 사용자 ID입니다." << std::endl;
+        return;
+    }
+
+    std::vector<Rating> userRatings =
+        ratingManager.findByUser(userId);
+
+    movieManager.printUserPreferenceProfile(userId, userRatings);
+}
+
 void MovieRecommenderApp::runMenuLoop() {
     int choice;
 
@@ -366,6 +385,10 @@ void MovieRecommenderApp::runMenuLoop() {
 
         else if (choice == MenuOption::FILTER_BY_GENRE) {
             handleGenreFilter();
+        }
+
+        else if (choice == MenuOption::USER_PREFERENCE_PROFILE) {
+            handleUserPreferenceProfile();
         }
 
         else if (choice == MenuOption::EXIT) {

@@ -311,6 +311,219 @@ void MovieManager::printTopNMovies(int n) const {
     }
 }
 
+double MovieManager::getUserAverageRating(
+    const std::vector<Rating>& userRatings
+) const {
+    if (userRatings.empty()) {
+        return AppConstants::MIN_RATING;
+    }
+
+    double ratingSum = 0.0;
+    int ratingCount = 0;
+
+    for (const Rating& rating : userRatings) {
+        if (!rating.isValid()) {
+            continue;
+        }
+
+        ratingSum += rating.getScore();
+        ratingCount++;
+    }
+
+    if (ratingCount == 0) {
+        return AppConstants::MIN_RATING;
+    }
+
+    return ratingSum / ratingCount;
+}
+
+std::map<std::string, double> MovieManager::getUserAverageRatingByGenre(
+    const std::vector<Rating>& userRatings
+) const {
+    std::map<std::string, double> ratingSumByGenre;
+    std::map<std::string, int> countByGenre;
+    std::map<std::string, double> averageByGenre;
+
+    for (const Rating& rating : userRatings) {
+        if (!rating.isValid()) {
+            continue;
+        }
+
+        const Movie* movie = findById(rating.getMovieId());
+
+        if (movie == nullptr) {
+            continue;
+        }
+
+        std::string genre = movie->getGenre();
+
+        ratingSumByGenre[genre] += rating.getScore();
+        countByGenre[genre]++;
+    }
+
+    for (const auto& item : ratingSumByGenre) {
+        const std::string& genre = item.first;
+        double ratingSum = item.second;
+
+        if (countByGenre[genre] > 0) {
+            averageByGenre[genre] = ratingSum / countByGenre[genre];
+        }
+    }
+
+    return averageByGenre;
+}
+
+std::vector<std::pair<std::string, double>> MovieManager::getUserTopGenres(
+    const std::vector<Rating>& userRatings,
+    int n
+) const {
+    std::vector<std::pair<std::string, double>> topGenres;
+
+    if (n <= 0) {
+        return topGenres;
+    }
+
+    std::map<std::string, double> averageByGenre =
+        getUserAverageRatingByGenre(userRatings);
+
+    for (const auto& item : averageByGenre) {
+        topGenres.push_back({item.first, item.second});
+    }
+
+    std::sort(topGenres.begin(), topGenres.end(),
+        [](const std::pair<std::string, double>& a,
+           const std::pair<std::string, double>& b) {
+            if (std::abs(a.second - b.second) < AppConstants::EPSILON) {
+                return a.first < b.first;
+            }
+
+            return a.second > b.second;
+        }
+    );
+
+    if (static_cast<int>(topGenres.size()) > n) {
+        topGenres.resize(n);
+    }
+
+    return topGenres;
+}
+
+std::vector<std::pair<Movie, double>> MovieManager::getUserTopRatedMovies(
+    const std::vector<Rating>& userRatings,
+    int n
+) const {
+    std::vector<std::pair<Movie, double>> topMovies;
+
+    if (n <= 0) {
+        return topMovies;
+    }
+
+    for (const Rating& rating : userRatings) {
+        if (!rating.isValid()) {
+            continue;
+        }
+
+        const Movie* movie = findById(rating.getMovieId());
+
+        if (movie == nullptr) {
+            continue;
+        }
+
+        topMovies.push_back({*movie, rating.getScore()});
+    }
+
+    std::sort(topMovies.begin(), topMovies.end(),
+        [](const std::pair<Movie, double>& a,
+           const std::pair<Movie, double>& b) {
+            if (std::abs(a.second - b.second) < AppConstants::EPSILON) {
+                return a.first.getId() < b.first.getId();
+            }
+
+            return a.second > b.second;
+        }
+    );
+
+    if (static_cast<int>(topMovies.size()) > n) {
+        topMovies.resize(n);
+    }
+
+    return topMovies;
+}
+
+void MovieManager::printUserPreferenceProfile(
+    int userId,
+    const std::vector<Rating>& userRatings
+) const {
+    if (userRatings.empty()) {
+        std::cout << "해당 사용자의 평점 데이터가 없습니다." << std::endl;
+        return;
+    }
+
+    double averageRating = getUserAverageRating(userRatings);
+
+    std::vector<std::pair<std::string, double>> topGenres =
+        getUserTopGenres(
+            userRatings,
+            AppConstants::DEFAULT_PROFILE_GENRE_COUNT
+        );
+
+    std::vector<std::pair<Movie, double>> topMovies =
+        getUserTopRatedMovies(
+            userRatings,
+            AppConstants::DEFAULT_PROFILE_MOVIE_COUNT
+        );
+
+    std::cout << std::fixed
+              << std::setprecision(AppConstants::OUTPUT_PRECISION);
+
+    std::cout << "\n=== 사용자 취향 프로필 ===" << std::endl;
+    std::cout << "사용자 ID: " << userId << std::endl;
+    std::cout << "평가한 영화 수: "
+              << userRatings.size()
+              << "개" << std::endl;
+    std::cout << "사용자 평균 평점: "
+              << averageRating
+              << std::endl;
+
+    std::cout << "\n선호 장르 TOP "
+              << AppConstants::DEFAULT_PROFILE_GENRE_COUNT
+              << std::endl;
+
+    if (topGenres.empty()) {
+        std::cout << "장르 선호도를 계산할 수 없습니다." << std::endl;
+    } else {
+        int rank = 1;
+
+        for (const auto& genreInfo : topGenres) {
+            std::cout << rank << ". "
+                      << genreInfo.first
+                      << " - 평균 "
+                      << genreInfo.second
+                      << std::endl;
+            rank++;
+        }
+    }
+
+    std::cout << "\n높게 평가한 영화 TOP "
+              << AppConstants::DEFAULT_PROFILE_MOVIE_COUNT
+              << std::endl;
+
+    if (topMovies.empty()) {
+        std::cout << "높게 평가한 영화를 찾을 수 없습니다." << std::endl;
+    } else {
+        int rank = 1;
+
+        for (const auto& movieInfo : topMovies) {
+            std::cout << rank << ". "
+                      << movieInfo.first
+                      << " / 내 평점: "
+                      << movieInfo.second
+                      << std::endl;
+            rank++;
+        }
+    }
+}
+
 bool MovieManager::hasMovie(int movieId) const {
     return findById(movieId) != nullptr;
 }
