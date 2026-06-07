@@ -18,7 +18,15 @@ namespace MenuOption {
     constexpr int PRINT_ALL_RATINGS = 9;
     constexpr int COMPARE_USER_SIMILARITY = 10;
     constexpr int RECOMMEND_MOVIES = 11;
+    constexpr int SHOW_STATISTICS = 12;
     constexpr int FILTER_BY_GENRE = 13;
+}
+
+namespace StatisticsOption {
+    constexpr int RETURN_TO_MAIN = 0;
+    constexpr int OVERALL_AVERAGE = 1;
+    constexpr int AVERAGE_BY_GENRE = 2;
+    constexpr int TOP_MOVIES = 3;
 }
 
 MovieRecommenderApp::MovieRecommenderApp()
@@ -67,9 +75,21 @@ void MovieRecommenderApp::printMenu() const {
     std::cout << "9. 전체 평점 목록 출력" << std::endl;
     std::cout << "10. 사용자 유사도 비교" << std::endl;
     std::cout << "11. 영화 추천" << std::endl;
+    std::cout << "12. 통계 보기" << std::endl;
     std::cout << "13. 장르별 영화 보기" << std::endl;
     std::cout << "0. 종료" << std::endl;
     std::cout << "메뉴 선택: ";
+}
+
+void MovieRecommenderApp::printStatisticsMenu() const {
+    std::cout << "\n=== 통계 메뉴 ===" << std::endl;
+    std::cout << "1. 전체 평균 평점" << std::endl;
+    std::cout << "2. 장르별 평균 평점" << std::endl;
+    std::cout << "3. 평점 Top "
+              << AppConstants::DEFAULT_TOP_MOVIE_COUNT
+              << " 영화" << std::endl;
+    std::cout << "0. 돌아가기" << std::endl;
+    std::cout << "통계 메뉴 선택: ";
 }
 
 void MovieRecommenderApp::handleAddMovie() {
@@ -244,6 +264,38 @@ void MovieRecommenderApp::handleRecommendation() {
     }
 }
 
+void MovieRecommenderApp::handleStatisticsMenu() {
+    int statisticsChoice;
+
+    do {
+        printStatisticsMenu();
+        std::cin >> statisticsChoice;
+
+        if (statisticsChoice == StatisticsOption::OVERALL_AVERAGE) {
+            movieManager.printOverallAverageRating();
+        }
+
+        else if (statisticsChoice == StatisticsOption::AVERAGE_BY_GENRE) {
+            movieManager.printAverageRatingByGenre();
+        }
+
+        else if (statisticsChoice == StatisticsOption::TOP_MOVIES) {
+            movieManager.printTopNMovies(
+                AppConstants::DEFAULT_TOP_MOVIE_COUNT
+            );
+        }
+
+        else if (statisticsChoice == StatisticsOption::RETURN_TO_MAIN) {
+            std::cout << "메인 메뉴로 돌아갑니다." << std::endl;
+        }
+
+        else {
+            std::cout << "잘못된 통계 메뉴입니다." << std::endl;
+        }
+
+    } while (statisticsChoice != StatisticsOption::RETURN_TO_MAIN);
+}
+
 void MovieRecommenderApp::handleGenreFilter() {
     std::string genre;
 
@@ -306,6 +358,10 @@ void MovieRecommenderApp::runMenuLoop() {
 
         else if (choice == MenuOption::RECOMMEND_MOVIES) {
             handleRecommendation();
+        }
+
+        else if (choice == MenuOption::SHOW_STATISTICS) {
+            handleStatisticsMenu();
         }
 
         else if (choice == MenuOption::FILTER_BY_GENRE) {

@@ -19,6 +19,8 @@ private:
     void rebuildMovieRatings();
 
     void printMenu() const;
+    void printStatisticsMenu() const;
+
     void runMenuLoop();
 
     void handleAddMovie();
@@ -28,6 +30,8 @@ private:
     void handlePrintRatingsByMovie();
     void handleSimilarityComparison();
     void handleRecommendation();
+    void handleStatisticsMenu();
+    void handleGenreFilter();
 
 public:
     MovieRecommenderApp();

@@ -6,6 +6,7 @@
 #include <utility>
 #include <cmath>
 #include <exception>
+#include <iomanip>
 
 void MovieManager::sortMoviesById() {
     std::sort(movies.begin(), movies.end(),
@@ -171,7 +172,142 @@ void MovieManager::printAvailableGenres() const {
     std::cout << "\n=== 선택 가능한 장르 목록 ===" << std::endl;
 
     for (int i = 0; i < static_cast<int>(genres.size()); i++) {
-        std::cout << genres[i] << std::endl;
+        std::cout << i + 1 << ". " << genres[i] << std::endl;
+    }
+}
+
+double MovieManager::getOverallAverageRating() const {
+    double ratingSum = 0.0;
+    int ratedMovieCount = 0;
+
+    for (const Movie& movie : movies) {
+        if (movie.getRatingCount() == 0) {
+            continue;
+        }
+
+        ratingSum += movie.getAverageRating();
+        ratedMovieCount++;
+    }
+
+    if (ratedMovieCount == 0) {
+        return AppConstants::MIN_RATING;
+    }
+
+    return ratingSum / ratedMovieCount;
+}
+
+std::map<std::string, double> MovieManager::getAverageRatingByGenre() const {
+    std::map<std::string, double> ratingSumByGenre;
+    std::map<std::string, int> countByGenre;
+    std::map<std::string, double> averageByGenre;
+
+    for (const Movie& movie : movies) {
+        if (movie.getRatingCount() == 0) {
+            continue;
+        }
+
+        std::string genre = movie.getGenre();
+
+        ratingSumByGenre[genre] += movie.getAverageRating();
+        countByGenre[genre]++;
+    }
+
+    for (const auto& item : ratingSumByGenre) {
+        const std::string& genre = item.first;
+        double ratingSum = item.second;
+
+        if (countByGenre[genre] > 0) {
+            averageByGenre[genre] = ratingSum / countByGenre[genre];
+        }
+    }
+
+    return averageByGenre;
+}
+
+std::vector<Movie> MovieManager::getTopNMovies(int n) const {
+    std::vector<Movie> ratedMovies;
+
+    if (n <= 0) {
+        return ratedMovies;
+    }
+
+    for (const Movie& movie : movies) {
+        if (movie.getRatingCount() > 0) {
+            ratedMovies.push_back(movie);
+        }
+    }
+
+    std::sort(ratedMovies.begin(), ratedMovies.end(),
+        [](const Movie& a, const Movie& b) {
+            if (std::abs(a.getAverageRating() - b.getAverageRating())
+                < AppConstants::EPSILON) {
+                return a.getId() < b.getId();
+            }
+
+            return a.getAverageRating() > b.getAverageRating();
+        }
+    );
+
+    if (static_cast<int>(ratedMovies.size()) > n) {
+        ratedMovies.resize(n);
+    }
+
+    return ratedMovies;
+}
+
+void MovieManager::printOverallAverageRating() const {
+    double averageRating = getOverallAverageRating();
+
+    std::cout << std::fixed
+              << std::setprecision(AppConstants::OUTPUT_PRECISION);
+
+    if (averageRating == AppConstants::MIN_RATING) {
+        std::cout << "평점이 등록된 영화가 없습니다." << std::endl;
+        return;
+    }
+
+    std::cout << "\n전체 영화 평균 평점: "
+              << averageRating
+              << std::endl;
+}
+
+void MovieManager::printAverageRatingByGenre() const {
+    std::map<std::string, double> averageByGenre =
+        getAverageRatingByGenre();
+
+    if (averageByGenre.empty()) {
+        std::cout << "장르별 평균 평점을 계산할 데이터가 없습니다."
+                  << std::endl;
+        return;
+    }
+
+    std::cout << std::fixed
+              << std::setprecision(AppConstants::OUTPUT_PRECISION);
+
+    std::cout << "\n=== 장르별 평균 평점 ===" << std::endl;
+
+    for (const auto& item : averageByGenre) {
+        std::cout << item.first << ": "
+                  << item.second
+                  << std::endl;
+    }
+}
+
+void MovieManager::printTopNMovies(int n) const {
+    std::vector<Movie> topMovies = getTopNMovies(n);
+
+    if (topMovies.empty()) {
+        std::cout << "평점이 등록된 영화가 없습니다." << std::endl;
+        return;
+    }
+
+    std::cout << "\n=== 평점 TOP " << n << " 영화 ===" << std::endl;
+
+    int rank = 1;
+
+    for (const Movie& movie : topMovies) {
+        std::cout << rank << ". " << movie << std::endl;
+        rank++;
     }
 }
 

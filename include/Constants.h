@@ -16,6 +16,7 @@ namespace AppConstants {
 
     constexpr int DEFAULT_SIMILAR_USER_COUNT = 3;
     constexpr int DEFAULT_RECOMMENDATION_COUNT = 5;
+    constexpr int DEFAULT_TOP_MOVIE_COUNT = 10;
 
     constexpr int OUTPUT_PRECISION = 1;
 }

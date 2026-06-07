@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include <vector>
 #include <string>
+#include <map>
 
 class MovieManager : public BaseManager {
 private:
@@ -32,6 +33,18 @@ public:
     std::vector<std::string> getAllGenres() const;
 
     void printAvailableGenres() const;
+
+    double getOverallAverageRating() const;
+
+    std::map<std::string, double> getAverageRatingByGenre() const;
+
+    std::vector<Movie> getTopNMovies(int n) const;
+
+    void printOverallAverageRating() const;
+
+    void printAverageRatingByGenre() const;
+
+    void printTopNMovies(int n) const;
 
     bool hasMovie(int movieId) const;
 
